@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.docx
+.uploads/
+dist/
+project.private.config.json
+miniprogram/project.private.config.json

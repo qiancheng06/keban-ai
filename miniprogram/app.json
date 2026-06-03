@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/discover/discover",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "课伴AI",
+    "navigationBarBackgroundColor": "#2563EB",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F9FAFB"
+  },
+  "tabBar": {
+    "color": "#9CA3AF",
+    "selectedColor": "#2563EB",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab_home.png",
+        "selectedIconPath": "images/tab_home.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "发现",
+        "iconPath": "images/tab_discover.png",
+        "selectedIconPath": "images/tab_discover.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tab_profile.png",
+        "selectedIconPath": "images/tab_profile.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

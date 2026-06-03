@@ -1,0 +1,13 @@
+{
+  "name": "kebana-ai",
+  "version": "1.0.0",
+  "description": "课伴AI - 大学生智能学习与资料整合平台 (Demo)",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "docx": "^9.6.1",
+    "express": "^4.18.2"
+  }
+}

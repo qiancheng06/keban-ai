@@ -1,0 +1,195 @@
+<view class="page fade-in">
+  <!-- Greeting Banner -->
+  <view class="greeting-banner">
+    <view class="greeting-text">早上好，<text class="greeting-name">{{userName}}</text></view>
+    <view class="greeting-sub">今日宜学习</view>
+  </view>
+
+  <!-- Stats Cards -->
+  <view class="stats-row">
+    <view class="stat-card blue">
+      <view class="stat-number">{{stats.daysUntilExam}}</view>
+      <view class="stat-label">距期末考</view>
+    </view>
+    <view class="stat-card green">
+      <view class="stat-number">{{stats.pendingCourses}}</view>
+      <view class="stat-label">待复习</view>
+    </view>
+    <view class="stat-card amber">
+      <view class="stat-number">{{stats.streakDays}}</view>
+      <view class="stat-label">连续学习</view>
+    </view>
+  </view>
+
+  <!-- 8-Function Grid -->
+  <view class="section-label">功能</view>
+  <view class="grid-8">
+    <view class="grid-item" bindtap="showUpload"><view class="grid-icon upload">+</view><view class="grid-text">上传资料</view></view>
+    <view class="grid-item" bindtap="showNote"><view class="grid-icon note">N</view><view class="grid-text">AI笔记</view></view>
+    <view class="grid-item" bindtap="showOutline"><view class="grid-icon outline">O</view><view class="grid-text">复习提纲</view></view>
+    <view class="grid-item" bindtap="showError"><view class="grid-icon error">E</view><view class="grid-text">错题分析</view></view>
+    <view class="grid-item" bindtap="showChat"><view class="grid-icon chat">Ai</view><view class="grid-text">AI答疑</view></view>
+    <view class="grid-item" bindtap="showBuddy"><view class="grid-icon buddy">P</view><view class="grid-text">学习搭子</view></view>
+    <view class="grid-item" bindtap="showPlan"><view class="grid-icon plan">T</view><view class="grid-text">学习计划</view></view>
+    <view class="grid-item" bindtap="showGPA"><view class="grid-icon gpa">G</view><view class="grid-text">绩点计算</view></view>
+  </view>
+
+  <!-- Hot Notes -->
+  <view class="section-label">学霸笔记推荐</view>
+  <scroll-view class="h-scroll" scroll-x enable-flex>
+    <view class="h-card" wx:for="{{notes}}" wx:key="id" data-id="{{item.id}}" bindtap="showNoteDetail">
+      <view class="h-card-emoji">{{item.emoji}}</view>
+      <view class="h-card-title">{{item.title}}</view>
+      <view class="h-card-meta">{{item.likes}} 收藏</view>
+    </view>
+  </scroll-view>
+
+  <!-- Video Search -->
+  <view class="section-label">知识点视频</view>
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <text class="search-placeholder">搜索知识点、课程名...</text>
+  </view>
+
+  <view style="height:60px"></view>
+</view>
+
+<!-- Modal Overlay -->
+<view class="modal-overlay {{showModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-mask" bindtap="closeModal"></view>
+  <view class="modal-box {{showModal ? 'slide-in' : ''}}">
+    <view class="modal-header">
+      <view class="modal-indicator"></view>
+      <text class="modal-title">{{modalTitle}}</text>
+    </view>
+    <scroll-view scroll-y class="modal-scroll" scroll-with-animation>
+      <!-- Upload -->
+      <view wx:if="{{modalType === 'upload'}}">
+        <view class="upload-hint">支持 PPT / PDF / Word</view>
+        <view class="upload-zone" bindtap="simulateUpload">
+          <view class="upload-icon">📄</view>
+          <view class="upload-text">{{uploading ? '正在解析文件...' : '点击选择文件'}}</view>
+          <view wx:if="{{uploading}}" class="upload-progress-bar"><view class="upload-progress-fill"></view></view>
+        </view>
+        <view wx:if="{{uploadDone}}" class="upload-done">
+          <view class="upload-done-text">笔记生成完成，共提取 4 个章节、12 个知识点</view>
+          <button class="btn btn-primary" bindtap="showNoteFromUpload">查看笔记详情</button>
+        </view>
+      </view>
+
+      <!-- Note -->
+      <view wx:elif="{{modalType === 'note'}}">
+        <view class="note-title">{{aiNote.title}}</view>
+        <view wx:for="{{aiNote.sections}}" wx:key="heading" class="note-section">
+          <view class="note-h3">{{item.heading}}</view>
+          <view wx:for="{{item.points}}" wx:key="*this" class="note-li">{{item}}</view>
+        </view>
+      </view>
+
+      <!-- Outline -->
+      <view wx:elif="{{modalType === 'outline'}}">
+        <view class="note-title">{{aiOutline.title}}</view>
+        <view class="section-sub-label">核心考点</view>
+        <view wx:for="{{aiOutline.keyPoints}}" wx:key="topic" class="outline-card">
+          <view class="outline-row">
+            <text class="outline-topic">{{item.topic}}</text>
+            <text class="outline-imp">{{item.importance}}</text>
+          </view>
+          <view class="outline-tips">{{item.tips}}</view>
+        </view>
+        <view class="section-sub-label">考试预测</view>
+        <view wx:for="{{aiOutline.examPredict}}" wx:key="*this" class="predict-item">{{item}}</view>
+      </view>
+
+      <!-- Error -->
+      <view wx:elif="{{modalType === 'error'}}">
+        <textarea class="error-input" placeholder="输入题目内容..." value="{{errorInput}}" bindinput="onErrorInput"></textarea>
+        <button class="btn btn-primary" bindtap="submitError" disabled="{{errorLoading}}">{{errorLoading ? 'AI 分析中...' : 'AI 分析'}}</button>
+        <view wx:if="{{errorResult}}" class="error-result">
+          <view class="error-card danger">
+            <text class="error-type">错误类型：概念混淆</text>
+            <text class="error-text">{{errorResult.analysis}}</text>
+          </view>
+          <view class="error-card info">
+            <text class="error-type">关联知识点</text>
+            <text wx:for="{{errorResult.relatedKnowledge}}" wx:key="*this" class="error-text">&#x2022; {{item}}</text>
+          </view>
+          <view class="error-card success-card">
+            <text class="error-type">学习建议</text>
+            <text class="error-text">{{errorResult.recommendation}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Chat -->
+      <view wx:elif="{{modalType === 'chat'}}">
+        <scroll-view scroll-y class="chat-box" scroll-into-view="{{chatScrollId}}" scroll-with-animation>
+          <view class="chat-msg ai">你好！有什么学习问题？</view>
+          <view wx:for="{{chatHistory}}" wx:key="index">
+            <view class="chat-msg {{item.role === 'user' ? 'user' : 'ai'}}">{{item.content}}</view>
+          </view>
+          <view id="chat-bottom"></view>
+        </scroll-view>
+        <view class="chat-input-row">
+          <input class="chat-input" placeholder="输入问题..." value="{{chatInput}}" bindinput="onChatInput"/>
+          <button class="btn btn-primary chat-send" bindtap="sendChat">发送</button>
+        </view>
+      </view>
+
+      <!-- Buddy -->
+      <view wx:elif="{{modalType === 'buddy'}}">
+        <view class="buddy-hint">基于专业和目标，为你推荐以下学习伙伴：</view>
+        <view wx:for="{{buddies}}" wx:key="id" class="buddy-card">
+          <text class="buddy-avatar">{{item.avatar}}</text>
+          <view class="buddy-info">
+            <text class="buddy-name">{{item.name}}</text>
+            <text class="buddy-meta">{{item.major}} · 目标：{{item.target}}</text>
+            <view class="buddy-tags"><text wx:for="{{item.commonCourses}}" wx:key="*this" class="buddy-tag">{{item}}</text></view>
+          </view>
+          <button class="buddy-btn" data-id="{{item.id}}" bindtap="inviteBuddy">{{item.invited ? '已邀请' : '组队'}}</button>
+        </view>
+      </view>
+
+      <!-- Plan -->
+      <view wx:elif="{{modalType === 'plan'}}">
+        <view class="plan-courses">
+          <view class="plan-cate active">高数</view>
+          <view class="plan-cate">C++</view>
+          <view class="plan-cate">大英</view>
+        </view>
+        <view class="plan-hint">距考试 23 天</view>
+        <view wx:for="{{planTasks}}" wx:key="index">
+          <label class="plan-task">
+            <checkbox checked="{{item.done}}" class="plan-checkbox"/>
+            <text class="plan-task-text {{item.done ? 'done' : ''}}">{{item.text}}</text>
+          </label>
+        </view>
+        <view class="plan-advice">AI 建议：本周重点突破中值定理部分</view>
+      </view>
+
+      <!-- GPA -->
+      <view wx:elif="{{modalType === 'gpa'}}">
+        <view wx:for="{{gpaCourses}}" wx:for-index="i" wx:key="i" class="gpa-row">
+          <input class="gpa-name" value="{{item.name}}" placeholder="课程" bindinput="onGPAInput" data-field="name" data-index="{{i}}"/>
+          <input class="gpa-score" value="{{item.score}}" placeholder="成绩" type="digit" bindinput="onGPAInput" data-field="score" data-index="{{i}}"/>
+          <input class="gpa-credit" value="{{item.credit}}" placeholder="学分" type="digit" bindinput="onGPAInput" data-field="credit" data-index="{{i}}"/>
+        </view>
+        <button class="gpa-add" bindtap="addGPACourse">+ 添加课程</button>
+        <button class="btn btn-primary" bindtap="calcGPA">计算绩点</button>
+        <view wx:if="{{gpaResult !== null}}" class="gpa-result">
+          <text class="gpa-result-label">平均绩点</text>
+          <text class="gpa-result-num">{{gpaResult}}</text>
+        </view>
+      </view>
+
+      <!-- Note Detail -->
+      <view wx:elif="{{modalType === 'noteDetail'}}">
+        <view class="note-title">{{noteDetail.title}}</view>
+        <view class="note-detail-course">{{noteDetail.course}} · {{noteDetail.likes}} 收藏</view>
+        <view class="note-detail-preview">{{noteDetail.preview}}</view>
+        <view class="note-detail-ai">AI 补充：该章节是后续学习的基础，建议重点掌握。</view>
+      </view>
+    </scroll-view>
+    <button class="btn btn-primary modal-close-btn" bindtap="closeModal">关闭</button>
+  </view>
+</view>

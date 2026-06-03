@@ -1,0 +1,56 @@
+<view class="page fade-in">
+  <!-- Search -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input class="search-input" placeholder="搜索知识点、课程名..." value="{{searchQuery}}" bindinput="onSearch"/>
+    <text wx:if="{{searchQuery}}" class="search-clear" bindtap="clearSearch">✕</text>
+  </view>
+
+  <!-- Category Tabs -->
+  <view class="cate-tabs">
+    <view class="cate-tab {{currentTab === 'video' ? 'active' : ''}}" bindtap="switchTab" data-tab="video">视频</view>
+    <view class="cate-tab {{currentTab === 'note' ? 'active' : ''}}" bindtap="switchTab" data-tab="note">笔记</view>
+    <view class="cate-tab {{currentTab === 'buddy' ? 'active' : ''}}" bindtap="switchTab" data-tab="buddy">学习搭子</view>
+    <view class="cate-indicator" style="left: {{cateIndicatorLeft}}px; width: {{cateIndicatorWidth}}px;"></view>
+  </view>
+
+  <!-- Video Tab -->
+  <view wx:if="{{currentTab === 'video'}}">
+    <view wx:for="{{filteredVideos}}" wx:key="id" class="video-item" data-item="{{item}}" bindtap="showVideoDetail">
+      <view class="video-thumb {{'thumb-' + (item.course === '高数' ? 'math' : item.course === 'C++' ? 'code' : item.course === '大英' ? 'eng' : item.course === '线代' ? 'algebra' : 'prob')}}">
+        <text class="thumb-text">{{item.course}}</text>
+      </view>
+      <view class="video-info">
+        <view class="video-title">{{item.title}}</view>
+        <view class="video-meta">{{item.duration}} · {{item.views}}次播放</view>
+      </view>
+    </view>
+    <view wx:if="{{filteredVideos.length === 0}}" class="empty-state">未找到相关视频</view>
+  </view>
+
+  <!-- Note Tab -->
+  <view wx:elif="{{currentTab === 'note'}}">
+    <view wx:for="{{filteredNotes}}" wx:key="id" class="feed-card" data-id="{{item.id}}" bindtap="showNoteDetail">
+      <view class="feed-card-title">{{item.title}}</view>
+      <view class="feed-card-desc">{{item.preview}}</view>
+      <view class="feed-card-meta">{{item.course}} · {{item.likes}} 收藏</view>
+    </view>
+    <view wx:if="{{filteredNotes.length === 0}}" class="empty-state">未找到相关笔记</view>
+  </view>
+
+  <!-- Buddy Tab -->
+  <view wx:elif="{{currentTab === 'buddy'}}">
+    <view class="buddy-section-hint">基于专业和学习目标匹配：</view>
+    <view wx:for="{{buddies}}" wx:key="id" class="buddy-card">
+      <text class="buddy-avatar">{{item.avatar}}</text>
+      <view class="buddy-info">
+        <text class="buddy-name">{{item.name}}</text>
+        <text class="buddy-meta">{{item.major}} · {{item.target}}</text>
+        <view class="buddy-tags"><text wx:for="{{item.commonCourses}}" wx:key="*this" class="buddy-tag">{{item}}</text></view>
+      </view>
+      <button class="buddy-btn" data-id="{{item.id}}" bindtap="inviteBuddy">{{item.invited ? '已邀请' : '组队'}}</button>
+    </view>
+  </view>
+
+  <view style="height:60px"></view>
+</view>

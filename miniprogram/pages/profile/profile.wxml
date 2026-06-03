@@ -1,0 +1,101 @@
+<view class="page fade-in">
+  <!-- Banner -->
+  <view class="profile-banner">
+    <view class="profile-avatar">👨‍🎓</view>
+    <view class="profile-name">{{userName}}</view>
+    <view class="profile-desc">{{school}} · {{major}}</view>
+  </view>
+
+  <!-- Stats Grid -->
+  <view class="stats-grid">
+    <view class="stat-cell">
+      <text class="stat-num blue">{{stats.totalNotes}}</text>
+      <text class="stat-lbl">笔记</text>
+    </view>
+    <view class="stat-cell">
+      <text class="stat-num green">{{stats.totalErrors}}</text>
+      <text class="stat-lbl">错题</text>
+    </view>
+    <view class="stat-cell">
+      <text class="stat-num purple">{{stats.studyHours}}</text>
+      <text class="stat-lbl">学习时长</text>
+    </view>
+    <view class="stat-cell">
+      <text class="stat-num amber">{{stats.streakDays}}</text>
+      <text class="stat-lbl">连续学习</text>
+    </view>
+  </view>
+
+  <!-- Achievements -->
+  <view class="section-label">成就</view>
+  <view class="badge-row">
+    <view class="badge" wx:for="{{badges}}" wx:key="id">
+      <view class="badge-icon {{item.unlocked ? '' : 'locked'}}">{{item.icon}}</view>
+      <view class="badge-name">{{item.name}}</view>
+      <view class="badge-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <!-- Course Progress (foldable) -->
+  <view class="section-header" bindtap="toggleSection" data-key="showCourses">
+    <text class="section-label" style="padding:0">课程进度</text>
+    <text class="section-arrow {{showCourses ? 'up' : 'down'}}">▾</text>
+  </view>
+  <view wx:if="{{showCourses}}" class="course-list">
+    <view class="course-item" wx:for="{{courses}}" wx:key="id">
+      <view class="course-header">
+        <text class="course-name">{{item.name}}</text>
+        <text class="course-pct">{{item.percent}}%</text>
+      </view>
+      <view class="course-bar">
+        <view class="course-fill" style="width: {{item.percent}}%; background: {{item.color}};"></view>
+      </view>
+      <view class="course-meta">{{item.notes}} 篇笔记 · {{item.errors}} 道错题 · {{item.lastStudy}}</view>
+    </view>
+  </view>
+
+  <!-- Recent Activity (foldable) -->
+  <view class="section-header" bindtap="toggleSection" data-key="showActivities">
+    <text class="section-label" style="padding:0">最近学习</text>
+    <text class="section-arrow {{showActivities ? 'up' : 'down'}}">▾</text>
+  </view>
+  <view wx:if="{{showActivities}}" class="timeline">
+    <view class="tl-item" wx:for="{{activities}}" wx:key="id">
+      <view class="tl-dot" style="background: {{item.color}};"></view>
+      <view class="tl-line"></view>
+      <view class="tl-content">
+        <view class="tl-text">{{item.text}}</view>
+        <view class="tl-time">{{item.time}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Menu -->
+  <view class="section-label">功能</view>
+  <view class="menu-list">
+    <view class="menu-item" bindtap="showMyNotes">
+      <view class="menu-icon-box blue">N</view>
+      <text class="menu-text">我的笔记</text>
+      <text class="menu-value">{{stats.totalNotes}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="showMyErrors">
+      <view class="menu-icon-box red">E</view>
+      <text class="menu-text">错题本</text>
+      <text class="menu-value">{{stats.totalErrors}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item">
+      <view class="menu-icon-box gray">R</view>
+      <text class="menu-text">学习报告</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item">
+      <view class="menu-icon-box gray">S</view>
+      <text class="menu-text">设置</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view style="height:30px"></view>
+</view>
